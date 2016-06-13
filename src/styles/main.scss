@@ -75,10 +75,8 @@ body {
 }
 
 .grid-cell {
-  width: $tile-size;
-  height: $tile-size;
-  margin-right: $grid-spacing;
-  float: left;
+  width: 120px;
+  height: 120px;
 
   border-radius: $tile-border-radius;
 
