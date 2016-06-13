@@ -1,0 +1,90 @@
+// main.scss
+$field-width: 500px;
+$grid-spacing: 15px;
+$grid-row-cells: 4;
+$tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
+$tile-border-radius: 3px;
+
+$text-color: #776E65;
+$bright-text-color: #f9f6f2;
+
+$tile-color: #eee4da;
+$tile-gold-color: #edc22e;
+$tile-gold-glow-color: lighten($tile-gold-color, 15%);
+
+$game-container-background: #bbada0;
+
+$transition-speed: 100ms;
+
+html, body {
+  margin: 0;
+  padding: 0;
+
+  background: #faf8ef;
+  color: #776E65;
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+}
+
+body {
+  margin: 80px 0;
+}
+
+.container {
+  width: $field-width;
+  margin: 0 auto;
+}
+
+.game-container {
+  margin-top: 20px;
+}
+
+.grid-container {
+  position: absolute;
+  z-index: 1;
+  margin-top: 40px;
+  position: relative;
+  padding: $grid-spacing;
+
+  cursor: default;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+
+  background: $game-container-background;
+  border-radius: $tile-border-radius * 2;
+  width: $field-width;
+  height: $field-width;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid-row {
+  margin-bottom: $grid-spacing;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+.grid-cell {
+  width: $tile-size;
+  height: $tile-size;
+  margin-right: $grid-spacing;
+  float: left;
+
+  border-radius: $tile-border-radius;
+
+  background: rgba($tile-color, .35);
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

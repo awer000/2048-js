@@ -1,0 +1,11 @@
+node_modules
+.git
+.DS_Store
+.tmp
+
+/.sass-cache
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+npm-debug.log
+testem.log
