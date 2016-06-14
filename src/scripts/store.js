@@ -1,4 +1,4 @@
-import { generateCells, generateGrid, randomCell, flattern } from './utils';
+import { generateCells, generateGrid, randomCell, flattern, getCurrent } from './utils';
 
 const subscribers = [];
 let id = 0;
@@ -29,6 +29,8 @@ Store.prototype.reduce = function(action, state) {
   switch (action.type) {
     case 'INIT':
       return this.getInitialState(action.size);
+    case 'MOVE_TILE':
+      return moveInDirection(action.direction, state);
   }
   return state;
 };
@@ -80,6 +82,96 @@ function addTile(state, tile, value) {
   state.grid[tile.x][tile.y].push(tile);
   return state;
 }
+
+function moveInDirection(direction, state) {
+  state = Object.assign({}, state);
+  let tiles = flattern(flattern(state.grid));
+  tiles = sortTiles(tiles, direction);
+  state = moveTiles(state, tiles, direction);
+  return state;
+}
+
+function sortTiles(tiles, direction) {
+  const {axis, value} = getCurrent(direction);
+  tiles = tiles.sort((a, b) => {
+    return a[axis] - b[axis];
+  });
+  if (value < 0) tiles = tiles.reverse();
+  return tiles;
+}
+
+function moveTiles(state, tiles, direction) {
+  tiles.forEach(tile => state = moveTile(state, tile, direction));
+  return state;
+}
+
+function moveTile(state, tile, direction) {
+  state = Object.assign({}, state);
+  const available = findAvailableCell(state, tile, direction);
+  if (available) {
+    state.isActual = false;
+    state.grid[available.index][available.value].push(tile);
+    state.grid[tile.x][tile.y].pop();
+  }
+
+  return state;
+}
+
+function findAvailableCell(state, tile, direction) {
+  let available;
+  const {axis, value} = getCurrent(direction);
+  let from = tile[axis];
+  const to = value < 0 ? (4 - 1) : 0;
+  const arr = [];
+
+  while(from <= to) {
+    arr.push(from++);
+  }
+
+  arr.forEach(index => {
+    let path;
+    if (axis === 'x') {
+      path = {
+        index: index,
+        value: tile.y
+      };
+    } else {
+      path = {
+        index: tile.x,
+        value: index
+      };
+    }
+
+    const cell = state.grid[path.index][path.value];
+
+    if (!isSuitable(cell, tile)) {
+      available = null;
+      return;
+    }
+
+    if (tile.value === "x") {
+      if (cell.length === 1 || (!cell.length && !available)) available = path;
+    } else {
+      available = available || path;
+    }
+  });
+
+  return available;
+}
+
+function isSuitable(cell, tile) {
+  const t1 = cell[0] ? cell[0].value : '';
+  const t2 = tile.value;
+
+  if (cell.length > 1) return false;
+  if (cell.length) {
+    if (t1 === 'x' || t2 === 'x') return true;
+    if (t1 !== t2) return false;
+  }
+
+  return true;
+}
+
 
 
 export default Store;

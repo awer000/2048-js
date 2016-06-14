@@ -38,3 +38,30 @@ export function flattern(arr) {
     return a.concat(b);
   });
 }
+
+export function getCurrent(direction) {
+  let axis;
+  const axises = getVector(direction);
+
+  for (const current in axises) {
+    if ({}.hasOwnProperty.call(axises, current)) {
+      if (axises[current] !== 0) {
+        axis = current;
+      }
+    }
+  }
+
+  return {
+    axis,
+    value: axises[axis]
+  };
+}
+
+function getVector(direction) {
+  const VECTORS = {};
+  VECTORS.UP = {x: 1, y: 0};
+  VECTORS.LEFT = {x: 0, y: 1};
+  VECTORS.DOWN = {x: -1, y: 0};
+  VECTORS.RIGHT = {x: 0, y: -1};
+  return VECTORS[direction];
+}

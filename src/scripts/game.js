@@ -5,6 +5,7 @@ const Game = function Game(size) {
   this.size = size;
   this.$table = document.querySelector('.grid-container');
   this.$tileContainer = document.querySelector('.tile-container');
+  this.queue = [];
   this.setup();
 };
 
@@ -15,6 +16,7 @@ Game.prototype.setup = function() {
     type: 'INIT',
     size: 4
   });
+  this.eventListeners();
 };
 
 Game.prototype.render = function(state) {
@@ -29,5 +31,39 @@ Game.prototype.render = function(state) {
     this.$tileContainer.appendChild($tile);
   }
 };
+
+Game.prototype.eventListeners = function () {
+  var map = {
+    38: 'UP',
+    39: 'RIGHT',
+    40: 'DOWN',
+    37: 'LEFT',
+    75: 'UP',
+    76:'RIGHT',
+    74: 'DOWN',
+    72: 'LEFT'
+  };
+  document.addEventListener("keydown", (event) => {
+    var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
+                    event.shiftKey;
+    var direction    = map[event.which];
+
+    if (!modifiers) {
+      if (direction !== undefined) {
+        event.preventDefault();
+        this._prepare(direction);
+      }
+    }
+  });
+};
+
+Game.prototype._prepare = function(direction) {
+  this.store.dispatch({
+    type: 'MOVE_TILE',
+    direction
+  })
+};
+
+
 
 export default Game;
