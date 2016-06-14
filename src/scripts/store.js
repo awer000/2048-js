@@ -31,6 +31,10 @@ Store.prototype.reduce = function(action, state) {
       return this.getInitialState(action.size);
     case 'MOVE_TILE':
       return moveInDirection(action.direction, state);
+    case 'ACTUALIZE':
+      return actualize(state);
+    case 'MERGE_TILE':
+      return mergeTiles(state);
   }
   return state;
 };
@@ -85,10 +89,26 @@ function addTile(state, tile, value) {
 
 function moveInDirection(direction, state) {
   state = Object.assign({}, state);
+  let initial = state;
+  let directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
   let tiles = flattern(flattern(state.grid));
-  tiles = sortTiles(tiles, direction);
-  state = moveTiles(state, tiles, direction);
-  return state;
+
+  const check = (current) => {
+    if (current !== direction) initial = state;
+
+    directions = directions.filter(dir => dir !== current);
+    tiles = sortTiles(tiles, current);
+    state = moveTiles(state, tiles, current);
+
+    if (initial === state) {
+      if (directions.length) return check(directions[0]);
+      return state.win = false;
+    }
+
+    return (current !== direction) ? initial : state;
+  };
+
+  return check(direction);
 }
 
 function sortTiles(tiles, direction) {
@@ -121,16 +141,22 @@ function findAvailableCell(state, tile, direction) {
   let available;
   const {axis, value} = getCurrent(direction);
   let from = tile[axis];
-  const to = value < 0 ? (4 - 1) : 0;
+  let to = value < 0 ? (4 - 1) : 0;
   const arr = [];
 
-  while(from <= to) {
-    arr.push(from++);
+  if (from <= to) {
+    while(from <= to) {
+      arr.push(from++);
+    }
+  } else {
+    while(to >= from) {
+      arr.push(to--);
+    }
   }
 
-  arr.forEach(index => {
+  arr.forEach((index) => {
     let path;
-    if (axis === 'x') {
+    if (axis === 'y') {
       path = {
         index: index,
         value: tile.y
@@ -170,6 +196,62 @@ function isSuitable(cell, tile) {
   }
 
   return true;
+}
+
+function actualize(state) {
+  state = Object.assign({}, state);
+  let grid = state.grid;
+
+  grid.forEach((row, x) => {
+    row.forEach((cell, y) => {
+      if (!cell.length) return;
+      cell.forEach((tile, index) => {
+        if (tile.x !== x || tile.y !== y) {
+          grid[x][y][index].x = x;
+          grid[x][y][index].y = y;
+        }
+      });
+    });
+  });
+  state.isActual = true;
+  state.grid = grid;
+  return state;
+}
+
+function mergeTiles(state) {
+  state = Object.assign({}, state);
+  let cells = [];
+  let grid = state.grid;
+  let result = 0;
+
+  grid.forEach((row, x) => {
+    row.forEach((cell, y) => {
+      if (!cell.length) {
+        cells.push({x, y});
+      }
+      if (cell.length > 1) {
+        const value = cell.reduce((t1, t2) => calculateTiles(t1, t2));
+
+        result += value;
+        // grid = grid.updateIn([x, y], () => List.of(cell.first().merge({value, id: id++})));
+        state.win = (value === '2048' || null);
+        state.score += value;
+      }
+    });
+  });
+
+  state.cells = cells;
+  state.result = result;
+  state.grid = grid;
+
+  return state;
+
+}
+
+function calculateTiles(t1, t2) {
+  if (t1.value === "x") return t2.value * 2;
+  if (t2.value === "x") return t1.value * 2;
+  return t1.value + t2.value;
 }
 
 

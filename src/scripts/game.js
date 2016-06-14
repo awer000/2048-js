@@ -20,6 +20,7 @@ Game.prototype.setup = function() {
 };
 
 Game.prototype.render = function(state) {
+  this.$tileContainer.innerHTML='';
   const grid = state.grid;
   const tiles = flattern(flattern(grid));
   for (let i=0; i < tiles.length; i++) {
@@ -37,11 +38,7 @@ Game.prototype.eventListeners = function () {
     38: 'UP',
     39: 'RIGHT',
     40: 'DOWN',
-    37: 'LEFT',
-    75: 'UP',
-    76:'RIGHT',
-    74: 'DOWN',
-    72: 'LEFT'
+    37: 'LEFT'
   };
   document.addEventListener("keydown", (event) => {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
@@ -61,7 +58,18 @@ Game.prototype._prepare = function(direction) {
   this.store.dispatch({
     type: 'MOVE_TILE',
     direction
-  })
+  });
+  setTimeout(() => {
+    this.store.dispatch({
+      type: 'ACTUALIZE'
+    });
+  }, 1000);
+
+  setTimeout(() => {
+    this.store.dispatch({
+      type: 'MERGE_TILE'
+    });
+  }, 200);
 };
 
 
