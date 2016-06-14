@@ -29,7 +29,7 @@ export function generateGrid(x, y) {
 
 export function randomCell(cells) {
   const max = cells.length;
-  return cells[Math.floor(Math.random() * (max + 1))];
+  return cells[Math.floor(Math.random() * max)];
 }
 
 export function flattern(arr) {

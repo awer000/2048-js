@@ -49,25 +49,25 @@ Store.prototype.getInitialState = function(size) {
   let cell;
   while (startCount > 0) {
     cell = randomCell(state.cells);
+    console.log(cell);
     state = newTile(state, cell);
     startCount--;
   }
   return state;
 };
 
-function newTile(state, tile) {
+function newTile(state, cell) {
   state = Object.assign({}, state);
   if (!state.cells.length) return state;
 
-  tile = tile;
-  const x = flattern(state.grid).find((t) => {
+  const x = flattern(flattern(state.grid)).find((t) => {
     return t.value === 'x';
   });
 
-  if (id > 1 && !x) state = addTile(state, tile, "x");
-  else state = addTile(state, tile);
+  if (id > 1 && !x) state = addTile(state, cell, "x");
+  else state = addTile(state, cell);
   state.cells = state.cells.filter((obj) => {
-    return !(obj.x === tile.x && obj.y === tile.y);
+    return !(obj.x === cell.x && obj.y === cell.y);
   });
   return state;
 }

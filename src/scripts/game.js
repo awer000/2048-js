@@ -24,7 +24,7 @@ Game.prototype.render = function(state) {
     let $tile = document.createElement('div');
     $tile.classList.add('tile');
     $tile.classList.add(`tile-${tiles[i].value}`);
-    $tile.classList.add(`tile-position-${tiles[i].x}-${tiles[i].y}`);
+    $tile.classList.add(`tile-position-${tiles[i].x + 1}-${tiles[i].y + 1}`);
     $tile.innerHTML = tiles[i].value;
     this.$tileContainer.appendChild($tile);
   }
